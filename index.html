@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gaiola + Romaneio</title>
+  <style>
+    /* CSS */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+    }
+    .container {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 40px;
+      padding: 40px 35px;
+      max-width: 900px;
+      width: 100%;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    h1 {
+      color: #ffffff;
+      font-size: 2.5rem;
+      margin-bottom: 5px;
+    }
+    .subtitle {
+      color: #a0a0c0;
+      font-size: 1rem;
+      margin-bottom: 25px;
+      border-bottom: 2px solid rgba(255,255,255,0.08);
+      padding-bottom: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .status {
+      font-size: 0.85rem;
+      background: rgba(0,255,0,0.1);
+      padding: 4px 12px;
+      border-radius: 30px;
+      color: #7cff7c;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+    label {
+      color: #d0d0f0;
+      font-size: 1.1rem;
+      font-weight: 500;
+      text-align: left;
+    }
+    #searchInput {
+      padding: 18px 22px;
+      font-size: 1.8rem;
+      border: none;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      outline: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.3s;
+      text-align: center;
+      font-weight: 600;
+    }
+    #searchInput:focus {
+      outline: 2px solid #6c63ff;
+      background: rgba(255,255,255,0.15);
+    }
+    .button-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 14px 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+      flex: 1;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6c63ff, #3f3a9e);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(108,99,255,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); }
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: #c0c0e0;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.18); }
+    .result-area {
+      margin-top: 30px;
+      padding: 25px;
+      border-radius: 24px;
+      background: rgba(0,0,0,0.3);
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 2px dashed rgba(255,255,255,0.05);
+      transition: all 0.4s;
+    }
+    .result-area.found {
+      border: 2px solid #6c63ff;
+      background: rgba(108,99,255,0.12);
+    }
+    .result-area.not-found {
+      border: 2px solid #ff4757;
+      background: rgba(255,71,87,0.1);
+    }
+    .result-label {
+      color: #7a7a9a;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+    }
+    .result-gaiola {
+      font-size: 5rem;
+      font-weight: 800;
+      color: #6c63ff;
+      margin: 0;
+      text-shadow: 0 0 40px rgba(108,99,255,0.3);
+      line-height: 1.2;
+    }
+    .result-nome {
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+      padding: 5px 25px;
+      border-radius: 40px;
+      margin-top: 5px;
+    }
+    .result-sub {
+      color: #8a8aaa;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+    .romaneio-container {
+      margin-top: 30px;
+      width: 100%;
+      max-height: 400px;
+      overflow-y: auto;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+    }
+    .romaneio-container table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      color: #e0e0e0;
+    }
+    .romaneio-container th {
+      background: rgba(108,99,255,0.3);
+      padding: 10px;
+      text-align: left;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(4px);
+      z-index: 2;
+    }
+    .romaneio-container td {
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .romaneio-container tr:hover td {
+      background: rgba(255,255,255,0.05);
+    }
+    .fade-in {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @media (max-width:600px) {
+      .container { padding: 25px 15px; border-radius: 24px; }
+      h1 { font-size: 1.8rem; }
+      #searchInput { font-size: 1.4rem; padding: 14px; }
+      .result-gaiola { font-size: 3.5rem; }
+      .result-nome { font-size: 1.3rem; }
+      .romaneio-container table { font-size: 0.75rem; }
+      .romaneio-container th, .romaneio-container td { padding: 6px; }
+    }
+    .loading {
+      color: #ffd93d;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>📍 PAINEL ROTAS - AM</h1>
+  <div class="subtitle">
+    <span>Digite o ID para saber sua rota e paradas</span>
+    <span class="status" id="statusBadge">✅ Pronto</span>
+  </div>
+  <div class="input-group">
+    <label for="searchInput">ID do Veículo / Motorista:</label>
+    <input type="text" id="searchInput" placeholder="Ex: 553034" autofocus>
+  </div>
+  <div class="button-group">
+    <button class="btn btn-primary" id="searchBtn">🔍 BUSCAR</button>
+    <button class="btn btn-secondary" id="clearBtn">✕ LIMPAR</button>
+  </div>
+  <div class="result-area" id="resultArea">
+    <span class="result-label">RESULTADO DA CONSULTA</span>
+    <div class="result-gaiola" id="resultGaiola">—</div>
+    <div class="result-nome" id="resultNome">Aguardando...</div>
+    <span class="result-sub" id="resultSub">Digite o ID e aperte Buscar.</span>
+  </div>
+  <!-- Área do romaneio -->
+  <div id="romaneioArea" style="display:none;">
+    <div class="romaneio-container" id="romaneioContainer">
+      <table>
+        <thead>
+          <tr>
+            <th>Qtde.</th>
+            <th>Bairro</th>
+            <th>Cidade</th>
+            <th>Distância</th>
+            <th>Seq.</th>
+            <th>Stop</th>
+          </tr>
+        </thead>
+        <tbody id="romaneioBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  // =============================================================
+  // CONFIGURAÇÃO
+  // =============================================================
+  const API_KEY = 'AIzaSyBDGh6Uqto3S21PPyL3PkI5v9p40cqZfmo';
+
+  const MOTORISTAS_SPREADSHEET_ID = '1ErqASfKKcW3DBHSYuzKQQJxQe-GqKslz2ZyQQQKirgg';
+  const ROMANEIO_SPREADSHEET_ID = '1gdXgIrSPG0raiKTVAltKIKZXYLpCrb3IiaEVeYoA2Ps';
+
+  const MOTORISTAS_SHEET_NAME = 'ROTAS';
+  const ROMANEIO_SHEET_NAME = 'ROMANEIO';
+
+  const MOTORISTAS_URL = `https://sheets.googleapis.com/v4/spreadsheets/${MOTORISTAS_SPREADSHEET_ID}/values/${MOTORISTAS_SHEET_NAME}?key=${API_KEY}`;
+  const ROMANEIO_URL = `https://sheets.googleapis.com/v4/spreadsheets/${ROMANEIO_SPREADSHEET_ID}/values/${ROMANEIO_SHEET_NAME}?key=${API_KEY}`;
+
+  // =============================================================
+  // ELEMENTOS DOM
+  // =============================================================
+  const input = document.getElementById('searchInput');
+  const searchBtn = document.getElementById('searchBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const resultGaiola = document.getElementById('resultGaiola');
+  const resultNome = document.getElementById('resultNome');
+  const resultArea = document.getElementById('resultArea');
+  const resultSub = document.getElementById('resultSub');
+  const romaneioArea = document.getElementById('romaneioArea');
+  const romaneioBody = document.getElementById('romaneioBody');
+  const statusBadge = document.getElementById('statusBadge');
+
+  // =============================================================
+  // CACHE
+  // =============================================================
+  let motoristasCache = null;
+  let romaneioCache = null;
+
+  // =============================================================
+  // FUNÇÕES API
+  // =============================================================
+  async function fetchSheetData(url) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erro HTTP ${response.status}: ${errorText}`);
+      }
+      const data = await response.json();
+      if (!data.values || data.values.length < 2) {
+        throw new Error('Planilha vazia ou sem dados.');
+      }
+      return data.values;
+    } catch (error) {
+      console.error('Erro ao buscar dados:', error);
+      throw error;
+    }
+  }
+
+  // =============================================================
+  // CARREGAR MOTORISTAS
+  // =============================================================
+  async function carregarMotoristas() {
+    if (motoristasCache) return motoristasCache;
+
+    const values = await fetchSheetData(MOTORISTAS_URL);
+    const cabecalho = values[0].map(h => h.trim().toUpperCase());
+    const idxID = cabecalho.indexOf('ID');
+    const idxNome = cabecalho.indexOf('NOME');
+    const idxGaiola = cabecalho.indexOf('GAIOLA');
+
+    if (idxID === -1 || idxNome === -1 || idxGaiola === -1) {
+      throw new Error('Cabeçalho inválido: ID, NOME ou GAIOLA não encontrados.');
+    }
+
+    const motoristas = [];
+    for (let i = 1; i < values.length; i++) {
+      const linha = values[i];
+      const id = linha[idxID] ? linha[idxID].toString().trim() : '';
+      const nome = linha[idxNome] ? linha[idxNome].toString().trim() : '';
+      const gaiola = linha[idxGaiola] ? linha[idxGaiola].toString().trim() : '';
+      if (id && nome && gaiola) {
+        motoristas.push({ id, nome, gaiola });
+      }
+    }
+    motoristasCache = motoristas;
+    return motoristas;
+  }
+
+  // =============================================================
+  // CARREGAR ROMANEIO
+  // =============================================================
+  async function carregarRomaneio() {
+    if (romaneioCache) return romaneioCache;
+
+    const values = await fetchSheetData(ROMANEIO_URL);
+    const cabecalho = values[0].map(h => h.trim().toLowerCase());
+    const idxGaiola = cabecalho.findIndex(col => col.includes('corridor') || col === 'gaiola');
+    const idxSeq = cabecalho.indexOf('sequence');
+    const idxStop = cabecalho.indexOf('stop');
+    const idxNum = cabecalho.findIndex(col => col.includes('num') && col.includes('order'));
+    const idxDist = cabecalho.findIndex(col => col.includes('distance') || col === 'distancia');
+    const idxCity = cabecalho.indexOf('city');
+    const idxBairro = cabecalho.findIndex(col => col.includes('neighborhood') || col === 'bairro');
+
+    if (idxGaiola === -1) throw new Error('Coluna "Corridor" não encontrada.');
+
+    const romaneio = [];
+    for (let i = 1; i < values.length; i++) {
+      const linha = values[i];
+      const gaiola = linha[idxGaiola] ? linha[idxGaiola].toString().trim() : '';
+      if (!gaiola) continue;
+      romaneio.push({
+        gaiola: gaiola,
+        sequence: linha[idxSeq] || '',
+        stop: linha[idxStop] || '',
+        numOrder: linha[idxNum] || '',
+        distance: linha[idxDist] || '',
+        city: linha[idxCity] || '',
+        neighborhood: linha[idxBairro] || ''
+      });
+    }
+    romaneioCache = romaneio;
+    return romaneio;
+  }
+
+  // =============================================================
+  // CONSULTA PRINCIPAL
+  // =============================================================
+  async function performSearch() {
+    const typedId = input.value.trim();
+    resultArea.classList.remove('found', 'not-found');
+    romaneioArea.style.display = 'none';
+    romaneioBody.innerHTML = '';
+    statusBadge.textContent = '⏳ Carregando...';
+    statusBadge.style.color = '#ffd93d';
+
+    if (typedId === '') {
+      resultGaiola.textContent = '—';
+      resultGaiola.className = 'result-gaiola';
+      resultGaiola.style.color = '#ffffff';
+      resultNome.textContent = 'Digite um ID';
+      resultSub.textContent = 'Preencha o campo acima.';
+      statusBadge.textContent = '✅ Pronto';
+      statusBadge.style.color = '#7cff7c';
+      return;
+    }
+
+    try {
+      const motoristas = await carregarMotoristas();
+      const encontrado = motoristas.find(m => m.id === typedId);
+      if (!encontrado) {
+        throw new Error(`ID "${typedId}" não possuí rota atribuída nesse ciclo. Já se inscreve na lista de espera dos chamados!!`);
+      }
+
+      const romaneio = await carregarRomaneio();
+      const paradas = romaneio.filter(r => r.gaiola === encontrado.gaiola);
+
+      resultArea.classList.add('found');
+      resultGaiola.textContent = encontrado.gaiola;
+      resultGaiola.className = 'result-gaiola fade-in';
+      resultGaiola.style.color = '#6c63ff';
+      resultNome.textContent = `👤 ${encontrado.nome}`;
+      resultNome.className = 'result-nome fade-in';
+
+      // ===== ALTERAÇÃO CORRIGIDA AQUI =====
+      const totalPacotes = paradas.length;
+      const paradasUnicas = new Set(paradas.map(item => item.stop).filter(stop => stop && stop.trim() !== ''));
+      const totalParadas = paradasUnicas.size;
+      
+      resultSub.textContent = `✔ ID ${typedId} encontrado! (${totalPacotes} pacotes em ${totalParadas} paradas)`;
+      // ===================================
+
+      if (paradas.length > 0) {
+        romaneioArea.style.display = 'block';
+        romaneioBody.innerHTML = '';
+        paradas.forEach((item) => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.sequence || '-'}</td>
+            <td>${item.neighborhood || '-'}</td>
+            <td>${item.city || '-'}</td>
+            <td>${item.distance || '-'}</td>
+            <td>${item.sequence || '-'}</td>
+            <td>${item.stop || '-'}</td>
+          `;
+          romaneioBody.appendChild(tr);
+        });
+      } else {
+        romaneioArea.style.display = 'none';
+      }
+
+      statusBadge.textContent = '✅ Pronto';
+      statusBadge.style.color = '#7cff7c';
+    } catch (error) {
+      statusBadge.textContent = '❌ Erro';
+      statusBadge.style.color = '#ff4757';
+      resultArea.classList.add('not-found');
+      resultGaiola.textContent = '⚠️';
+      resultGaiola.className = 'result-gaiola fade-in';
+      resultGaiola.style.color = '#ff4757';
+      resultNome.textContent = 'SEM ROTA ATRIBUÍDA';
+      resultNome.className = 'result-nome fade-in';
+      resultSub.textContent = error.message || 'Erro desconhecido.';
+      romaneioArea.style.display = 'none';
+      console.error(error);
+    }
+  }
+
+  // =============================================================
+  // EVENTOS
+  // =============================================================
+  searchBtn.addEventListener('click', performSearch);
+  input.addEventListener('keyup', (e) => {
+    if (e.key === 'Enter') performSearch();
+  });
+  clearBtn.addEventListener('click', () => {
+    input.value = '';
+    resultGaiola.textContent = '—';
+    resultGaiola.className = 'result-gaiola';
+    resultGaiola.style.color = '#ffffff';
+    resultNome.textContent = 'Aguardando...';
+    resultNome.className = 'result-nome';
+    resultSub.textContent = 'Digite o ID e aperte Buscar.';
+    resultArea.classList.remove('found', 'not-found');
+    romaneioArea.style.display = 'none';
+    romaneioBody.innerHTML = '';
+    statusBadge.textContent = '✅ Pronto';
+    statusBadge.style.color = '#7cff7c';
+    input.focus();
+  });
+
+  window.addEventListener('load', () => {
+    input.focus();
+    carregarMotoristas().catch(err => console.warn('Pré-carga de motoristas falhou:', err));
+    carregarRomaneio().catch(err => console.warn('Pré-carga de romaneio falhou:', err));
+  });
+</script>
+</body>
+</html>
